@@ -7,9 +7,9 @@ MOVIE_URL = "https://district5.scenecinemas.com/movie-details/the-odyssey.html"
 DEFAULT_TOPIC = "amr_scene_tickets_2026"
 
 # Target configuration
-MOVIE = "Dune: Part Three"
+MOVIE = "The Odyssey"
 EXP = ""
-DATE = "18-10-2026"
+DATE = ""
 TIME = ""
 
 safe_topic = urllib.parse.quote(DEFAULT_TOPIC)
