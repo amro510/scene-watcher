@@ -9,7 +9,7 @@ DEFAULT_TOPIC = "amr_scene_tickets_2026"
 # Target configuration
 MOVIE = "The Odyssey"
 EXP = ""
-DATE = ""
+DATE = "31-10-2026"
 TIME = ""
 
 safe_topic = urllib.parse.quote(DEFAULT_TOPIC)
