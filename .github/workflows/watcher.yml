@@ -2,7 +2,7 @@ name: Scene Ticket Watcher
 
 on:
   schedule:
-    - cron: '*/7 * * * *'
+    - cron: '*/2 * * * *'
   workflow_dispatch: 
 
 jobs:
