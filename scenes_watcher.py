@@ -2,12 +2,21 @@ import requests
 import urllib.parse
 
 BRANCH_URL = "https://district5.scenecinemas.com/branches/scene-district-5.html"
+MOVIE_URL = "https://district5.scenecinemas.com/movie-details/the-odyssey.html"
 DEFAULT_TOPIC = "amr_scene_tickets_2026"
+
+# ==========================================
+# TARGET CONFIGURATION (Change these anytime)
+# ==========================================
+MOVIE = "the odyssey"
+EXP = ""
+DATE = ""  # Leave blank "" to match any date, or enter e.g. "2026-06-15"
+TIME = ""  # Leave blank "" to match any time, or enter e.g. "21:00"
+# ==========================================
 
 safe_topic = urllib.parse.quote(DEFAULT_TOPIC)
 ntfy_url = f"https://ntfy.sh/{safe_topic}"
 
-# Use a standard desktop browser User-Agent to avoid simple bot blocks
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -15,35 +24,35 @@ headers = {
 }
 
 try:
-    print("Testing connection to Scene Cinema...")
-    response = requests.get(BRANCH_URL, headers=headers, timeout=15)
+    print("Checking Scene Cinema District 5...")
+    res_branch = requests.get(BRANCH_URL, headers=headers, timeout=15)
+    res_movie = requests.get(MOVIE_URL, headers=headers, timeout=15)
     
-    print(f"Website HTTP Status Code: {response.status_code}")
-    print(f"Response text length: {len(response.text)}")
+    combined_html = (res_branch.text + " " + res_movie.text).lower()
+    clean_html = combined_html.replace(" ", "")
 
-    # FORCE a notification right now to test if ntfy.sh is working
-    test_message = f"Diagnostic Test: HTTP Status {response.status_code} (Length: {len(response.text)})"
-    
-    requests.post(
-        ntfy_url,
-        data=test_message.encode("utf-8"),
-        headers={
-            "Title": "Watcher Test Ping",
-            "Priority": "default",
-            "Tags": "bell",
-        },
-        timeout=10
-    )
-    print("Test notification dispatched to ntfy!")
+    movie_match = MOVIE.lower() in combined_html if MOVIE else True
+    exp_match = EXP.lower().replace(" ", "") in clean_html if EXP else True
+    date_match = DATE.lower().replace(" ", "") in clean_html if DATE else True
+    time_match = TIME.lower().replace(" ", "") in clean_html if TIME else True
+
+    if movie_match and exp_match and date_match and time_match:
+        print("🎉 TICKETS ARE AVAILABLE!")
+        payload_data = f"Showtimes for {MOVIE.upper()} ({EXP.upper()}) are live at District 5! Tap to book now."
+        
+        requests.post(
+            ntfy_url,
+            data=payload_data.encode("utf-8"),
+            headers={
+                "Title": "TICKETS ARE LIVE!",
+                "Priority": "high",
+                "Tags": "clapper,ticket",
+                "Click": BRANCH_URL,
+            },
+            timeout=10
+        )
+    else:
+        print("[-] Showtimes not open yet. Staying quiet.")
 
 except Exception as e:
-    error_msg = f"❌ Error connecting to cinema: {str(e)}"
-    print(error_msg)
-    
-    # Send error to your phone so you know it failed
-    requests.post(
-        ntfy_url,
-        data=error_msg.encode("utf-8"),
-        headers={"Title": "Watcher Error", "Priority": "high"},
-        timeout=10
-    )
+    print(f"❌ Error checking cinema: {e}")
