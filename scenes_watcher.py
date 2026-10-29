@@ -8,7 +8,7 @@ DEFAULT_TOPIC = "amr_scene_tickets_2026"
 # ==========================================
 # TARGET CONFIGURATION (Change these anytime)
 # ==========================================
-MOVIE = "the odyssey"
+MOVIE = "the"
 EXP = ""
 DATE = ""  # Leave blank "" to match any date, or enter e.g. "2026-06-15"
 TIME = ""  # Leave blank "" to match any time, or enter e.g. "21:00"
